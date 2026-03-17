@@ -1,0 +1,8 @@
+-- Concurrent Tasks --
+[*] - Make the pawn somehow move.
+[*] - Hightlight all the possible moves(for pawn hehe).
+[ ] - Move the pawn in a valid manner.
+
+-- Later --
+[ ] - Make some more assets for the pieces.
+[ ] - Maybe refactor my code a lil bit after.

@@ -1,5 +1,7 @@
 import os
 import pygame
+from colors import colors
+import pieces
 
 pygame.init()
 scrSize = (1280, 720)
@@ -8,24 +10,16 @@ screen = pygame.display.set_mode(scrSize, pygame.RESIZABLE)
 clock = pygame.time.Clock()
 pygame.display.set_caption("Chess dumbass")
 
-
 # Global variables
 isRunning = True
 boardSize = {'rows': 8, 'cols': 8, 'size': 50}
-board = [[0 for _ in range(boardSize['rows'])] for _ in range(boardSize['cols'])]
+allPiecesRect = [] # list of all pieces to track collision
 
-
-# Colors
-colors = {
-    'bg-1': pygame.Color(207, 131, 112),
-    'white': pygame.Color(238, 238, 238),
-    'black': pygame.Color(48, 48, 48),
-}
-
+# Board layout [row][column]
+board = [[[0, 0] for _ in range(boardSize['rows'])] for _ in range(boardSize['cols'])]
 
 # Load images
 pawn_path = os.path.join('ass', 'pawn_chessting.png')
-pawn_surface = None
 
 # Load surfaces of images
 try:
@@ -38,6 +32,10 @@ except pygame.error as err:
 # Main loop
 def main():
     global isRunning
+
+    # Local no loop variables
+    testpawn1_toggle = False
+    allPiecesRect.append(pygame.Rect(0, 0, 0, 0))
     while isRunning:
         scrCenter = screen.get_size()
 
@@ -58,17 +56,22 @@ def main():
             'y': (scrCenter[1] / 2) - ((boardSize['size'] * boardSize['rows']) / 2)
         }
 
+        # DISPLAY METHODS
         screen.fill(colors['bg-1'])
         renderBoard(boardPos['x'], boardPos['y'])
 
-        # test field
-        testRect = pygame.Rect(20, 20, 50, 50)
-        pygame.draw.rect(screen, "red", testRect)
-        resized_pawn = pygame.transform.scale(pawn_surface, (50, 50))
-        screen.blit(resized_pawn, testRect)
+        pawn_test = pieces.Pawn(False, 3, 7, board)
+        allPiecesRect[0] = pawn_test.rect
+        pawn_test.isSelected = testpawn1_toggle
+        pawn_test.display(screen, pawn_surface)
 
         pygame.display.flip()
         clock.tick(mainFps)
+
+        ms_x, ms_y = pygame.mouse.get_pos()
+        if allPiecesRect[0].collidepoint(ms_x, ms_y) and pygame.mouse.get_just_pressed()[0]:
+            testpawn1_toggle = not testpawn1_toggle
+
     pygame.quit()
 
 
@@ -78,6 +81,7 @@ def renderBoard(board_offset_x, board_offset_y):
     stack_x, stack_y = 0, 0
 
     blackFirst = True
+    global board
     for c, row in enumerate(board):
         stack_x = 0
         color_switch = blackFirst
@@ -95,6 +99,7 @@ def renderBoard(board_offset_x, board_offset_y):
 
             color_switch = not color_switch
             stack_x += boardSize['size']
+            board[i][c] = [tempRect.x, tempRect.y]
 
         blackFirst = not blackFirst
         stack_y += boardSize['size']
@@ -103,3 +108,4 @@ def renderBoard(board_offset_x, board_offset_y):
 # Execute guard
 if __name__ == "__main__":
     main()
+    print(board)
