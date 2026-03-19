@@ -36,6 +36,7 @@ def main():
     # Local no loop variables
     testpawn1_toggle = False
     allPiecesRect.append(pygame.Rect(0, 0, 0, 0))
+    pawn_test = pieces.Pawn(False, 3, 7, board)
     while isRunning:
         scrCenter = screen.get_size()
 
@@ -60,7 +61,6 @@ def main():
         screen.fill(colors['bg-1'])
         renderBoard(boardPos['x'], boardPos['y'])
 
-        pawn_test = pieces.Pawn(False, 3, 7, board)
         allPiecesRect[0] = pawn_test.rect
         pawn_test.isSelected = testpawn1_toggle
         pawn_test.display(screen, pawn_surface)
@@ -69,8 +69,17 @@ def main():
         clock.tick(mainFps)
 
         ms_x, ms_y = pygame.mouse.get_pos()
-        if allPiecesRect[0].collidepoint(ms_x, ms_y) and pygame.mouse.get_just_pressed()[0]:
+        mouseLeftClicked = pygame.mouse.get_just_pressed()[0]
+        if allPiecesRect[0].collidepoint(ms_x, ms_y) and mouseLeftClicked:
             testpawn1_toggle = not testpawn1_toggle
+            print("Touched the piece.")
+
+        testpawn1_target = pawn_test.target_rect()
+        if testpawn1_toggle and testpawn1_target.collidepoint(ms_x, ms_y) and mouseLeftClicked:
+            pawn_test.position['y'] -= 1
+            testpawn1_toggle = False
+            print(pawn_test.position)
+            print("Tried moving the piece fr.")
 
     pygame.quit()
 
